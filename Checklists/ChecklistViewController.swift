@@ -19,26 +19,50 @@ class ChecklistViewController: UITableViewController, ItemDetailViewControllerDe
         
         navigationController?.navigationBar.prefersLargeTitles = true
         
-        let item1 = ChecklistItem()
-        item1.text = "Walk the dog"
-        items.append(item1)
-        let item2 = ChecklistItem()
-        item2.text = "Brush my teeth"
-        item2.checked = true
-        items.append(item2)
-        let item3 = ChecklistItem()
-        item3.text = "Learn iOS development"
-        item3.checked = true
-        items.append(item3)
-        let item4 = ChecklistItem()
-        item4.text = "Soccer practice"
-        items.append(item4)
-        let item5 = ChecklistItem()
-        item5.text = "Eat ice cream"
-        items.append(item5)
+        loadChecklistItems()
+        
+        print("Documents folder is \(documentsDirectory())")
+        print("Data file path is \(dataFilePath())")
     }
     
-    //MARK:- Actions
+    //MARK:- Saving/Loading data to/from a file.
+    func saveChecklistItems() {
+        //Create an instance of PropertyListEncoder
+        let encoder = PropertyListEncoder()
+        
+        //Sets up a block to catch errors.
+        do {
+            //try to encode the items array.
+            let data = try encoder.encode(items)
+            //if the constant was created then write the data to a file.
+            try data.write(to: dataFilePath(), options: Data.WritingOptions.atomic)
+        //execute if an error was thrown.
+        } catch {
+            //print the error.
+            print("Error encoding item array: \(error.localizedDescription)")
+        }
+        
+    }
+    
+    func loadChecklistItems() {
+        //put the results dataFilePath in a temp constant.
+        let path = dataFilePath()
+        //try to load the contents of Checklists.plist into a new data object
+        if let data = try? Data(contentsOf: path) {
+            //load the entire array its contents
+            let decoder = PropertyListDecoder()
+            
+            do {
+                //load the saved data back into items
+                items = try decoder.decode([ChecklistItem].self, from: data)
+            } catch {
+                //if there was an error, print it in the console.
+                print("Error decoding item array:  \(error.localizedDescription)")
+            }
+        }
+    }
+    
+    //MARK:- Actions?
     
     //sets text for cell label from items array.
     func congfigureText(for cell: UITableViewCell,
@@ -58,6 +82,18 @@ class ChecklistViewController: UITableViewController, ItemDetailViewControllerDe
         } else {
             label.text = ""
         }
+    }
+    
+    //gets the full path to the documents folder (or does it?)
+    func documentsDirectory() -> URL {
+        let paths = FileManager.default.urls(for: .documentDirectory,
+                                             in: .userDomainMask)
+        return paths[0]
+    }
+    
+    //Uses documentsDirectory to construct the full path to the Checklists.plist file.
+    func dataFilePath() -> URL {
+        return documentsDirectory().appendingPathComponent("Checklists.plist")
     }
     
     //MARK:- Navigation
@@ -87,6 +123,7 @@ class ChecklistViewController: UITableViewController, ItemDetailViewControllerDe
             }
         }
         navigationController?.popViewController(animated: true)
+        saveChecklistItems()
     }
     
     //closes the Add Item screen.
@@ -104,6 +141,7 @@ class ChecklistViewController: UITableViewController, ItemDetailViewControllerDe
         let indexPaths = [indexPath]
         tableView.insertRows(at: indexPaths, with: .automatic)
         navigationController?.popViewController(animated: true)
+        saveChecklistItems()
     }
     
     
@@ -118,6 +156,7 @@ class ChecklistViewController: UITableViewController, ItemDetailViewControllerDe
         //delete the item from the table view.
         let indexPaths = [indexPath]
         tableView.deleteRows(at: indexPaths, with: .automatic)
+        saveChecklistItems()
         
     }
     
@@ -135,6 +174,7 @@ class ChecklistViewController: UITableViewController, ItemDetailViewControllerDe
         
         tableView.deselectRow(at: indexPath,
                               animated: true)
+        saveChecklistItems()
     }
 
     // MARK:- Table View Data Source
