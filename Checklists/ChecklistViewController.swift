@@ -8,7 +8,8 @@
 
 import UIKit
 
-class ChecklistViewController: UITableViewController {
+class ChecklistViewController: UITableViewController, AddItemViewControllerDelegate {
+
     
     //items is a variable of ChecklistItem(s)
     var items = [ChecklistItem]()
@@ -39,7 +40,8 @@ class ChecklistViewController: UITableViewController {
     
     //MARK:- Actions
     //Add a new item to ChecklistItem()
-    @IBAction func addItem() {
+   
+    /*@IBAction func addItem() {
         let newRowIndex = items.count
         
         /*create a new ChecklistItem
@@ -56,7 +58,7 @@ class ChecklistViewController: UITableViewController {
         let indexPaths = [indexPath]
         //insert the new row with the new item.
         tableView.insertRows(at: indexPaths, with: .automatic)
-    }
+    }*/
 
     //sets text for cell label from items array.
     func congfigureText(for cell: UITableViewCell,
@@ -76,6 +78,34 @@ class ChecklistViewController: UITableViewController {
             cell.accessoryType = .none
         }
     }
+    
+    //MARK:- Navigation
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if segue.identifier == "AddItem" {
+            let controller = segue.destination as! AddItemViewController
+            
+            controller.delegate = self
+        }
+    }
+
+    //MARK:- Add Item ViewController Delgates
+    //closes the Add Item screen.
+    func addItemViewControllerDidCancel(_ controller: AddItemViewController) {
+        navigationController?.popViewController(animated: true)
+    }
+    
+    //closes the Add Item screen.
+    func addItemViewController(_ controller: AddItemViewController,
+                               didFinishAdding item: ChecklistItem) {
+        
+        let newRowIndex = items.count
+        items.append(item)
+        let indexPath = IndexPath(row: newRowIndex, section: 0)
+        let indexPaths = [indexPath]
+        tableView.insertRows(at: indexPaths, with: .automatic)
+        navigationController?.popViewController(animated: true)
+    }
+    
     
     // MARK:- Table View Delegate
     

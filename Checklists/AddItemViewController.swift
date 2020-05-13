@@ -8,19 +8,37 @@
 
 import UIKit
 
+//MARK:- defines AddItemViewControllerDelegate protocol
+protocol AddItemViewControllerDelegate: class {
+    
+    //user presses cancel.
+    func addItemViewControllerDidCancel(_ controller: AddItemViewController)
+    
+    //user presses done.
+    func addItemViewController(_ controller: AddItemViewController,
+                               didFinishAdding item: ChecklistItem)
+}
+
 class AddItemViewController: UITableViewController, UITextFieldDelegate {
     
     @IBOutlet weak var textField: UITextField!
     @IBOutlet weak var doneBarButton: UIBarButtonItem!
     
+    //a property that the view controller uses to refer to the delegate.
+    weak var delegate: AddItemViewControllerDelegate?
+    
     //MARK:- Actions
     @IBAction func cancel() {
-        navigationController?.popViewController(animated: true)
+        //Sends the message back to the delegate.
+        delegate?.addItemViewControllerDidCancel(self)
     }
     
     @IBAction func done() {
         print("Contents of the text field: \(textField.text!)")
-        navigationController?.popViewController(animated: true)
+        // Sends the message back to the delegate with an new ChecklistItem object.
+        let item = ChecklistItem()
+        item.text = textField.text!
+        delegate?.addItemViewController(self, didFinishAdding: item)
     }
     
     override func viewDidLoad() {
