@@ -1,5 +1,5 @@
 //
-//  AddItemViewController.swift
+//  ItemDetailViewController.swift
 //  Checklists
 //
 //  Created by Buck Rozelle on 5/12/20.
@@ -8,43 +8,68 @@
 
 import UIKit
 
-//MARK:- defines AddItemViewControllerDelegate protocol
-protocol AddItemViewControllerDelegate: class {
+//MARK:- defines ItemDetailViewControllerDelegate protocol
+protocol ItemDetailViewControllerDelegate: class {
     
     //user presses cancel.
-    func addItemViewControllerDidCancel(_ controller: AddItemViewController)
+    func itemDetailViewControllerDidCancel(_ controller: ItemDetailViewController)
     
-    //user presses done.
-    func addItemViewController(_ controller: AddItemViewController,
+    //user presses done after adding.
+    func itemDetailViewController(_ controller: ItemDetailViewController,
                                didFinishAdding item: ChecklistItem)
+    
+    //user presses done after editing.
+    func itemDetailViewController(_ controller: ItemDetailViewController,
+                               didFinishEditing item: ChecklistItem)
 }
 
-class AddItemViewController: UITableViewController, UITextFieldDelegate {
+
+
+class ItemDetailViewController: UITableViewController, UITextFieldDelegate {
+    
+    //? because the itemToEdit can be nil
+    var itemToEdit: ChecklistItem?
     
     @IBOutlet weak var textField: UITextField!
     @IBOutlet weak var doneBarButton: UIBarButtonItem!
     
     //a property that the view controller uses to refer to the delegate.
-    weak var delegate: AddItemViewControllerDelegate?
+    weak var delegate: ItemDetailViewControllerDelegate?
     
     //MARK:- Actions
     @IBAction func cancel() {
         //Sends the message back to the delegate.
-        delegate?.addItemViewControllerDidCancel(self)
+        delegate?.itemDetailViewControllerDidCancel(self)
     }
     
     @IBAction func done() {
         print("Contents of the text field: \(textField.text!)")
-        // Sends the message back to the delegate with an new ChecklistItem object.
-        let item = ChecklistItem()
-        item.text = textField.text!
-        delegate?.addItemViewController(self, didFinishAdding: item)
+        
+        //checks if itemToEdit has an object
+        if let item = itemToEdit {
+            item.text = textField.text!
+            delegate?.itemDetailViewController(self, didFinishEditing: item)
+    
+        } else {
+            // if not, then user is adding a new ChecklistItem object.
+            let item = ChecklistItem()
+            item.text = textField.text!
+            delegate?.itemDetailViewController(self, didFinishAdding: item)
     }
+}
     
     override func viewDidLoad() {
         super.viewDidLoad()
         navigationItem.largeTitleDisplayMode = .never
         textField.becomeFirstResponder()
+        
+        //Changes the title of the itemDetailViewController to Edit Item.
+        if let item = itemToEdit {
+            title = "Edit Item"
+            textField.text = item.text
+            //for edit mode.
+            doneBarButton.isEnabled = true
+        }
       
     }
     
