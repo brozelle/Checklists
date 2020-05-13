@@ -16,6 +16,8 @@ class ChecklistViewController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        navigationController?.navigationBar.prefersLargeTitles = true
+        
         let item1 = ChecklistItem()
         item1.text = "Walk the dog"
         items.append(item1)
@@ -33,6 +35,27 @@ class ChecklistViewController: UITableViewController {
         let item5 = ChecklistItem()
         item5.text = "Eat ice cream"
         items.append(item5)
+    }
+    
+    //MARK:- Actions
+    //Add a new item to ChecklistItem()
+    @IBAction func addItem() {
+        let newRowIndex = items.count
+        
+        /*create a new ChecklistItem
+         give it some text.
+         put it into items at the end.
+        */
+        let item = ChecklistItem()
+        item.text = "I am a new row"
+        items.append(item)
+        
+        //let tableView know about this new object. create the object.
+        let indexPath = IndexPath(row: newRowIndex, section: 0)
+        //Put it into a temp array.
+        let indexPaths = [indexPath]
+        //insert the new row with the new item.
+        tableView.insertRows(at: indexPaths, with: .automatic)
     }
 
     //sets text for cell label from items array.
@@ -55,6 +78,19 @@ class ChecklistViewController: UITableViewController {
     }
     
     // MARK:- Table View Delegate
+    
+    override func tableView(_ tableView: UITableView,
+                            commit editingStyle: UITableViewCell.EditingStyle,
+                            forRowAt indexPath: IndexPath) {
+        //Remove the item from the data model
+        items.remove(at: indexPath.row)
+        
+        //delete the item from the table view.
+        let indexPaths = [indexPath]
+        tableView.deleteRows(at: indexPaths, with: .automatic)
+        
+    }
+    
     override func tableView(_ tableView: UITableView,
                             didSelectRowAt indexPath: IndexPath) {
         
