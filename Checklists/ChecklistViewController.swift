@@ -10,6 +10,8 @@ import UIKit
 
 class ChecklistViewController: UITableViewController, ItemDetailViewControllerDelegate {
 
+    //for the Checklist screen title.
+    var checklist: Checklist!
     
     //items is a variable of ChecklistItem(s)
     var items = [ChecklistItem]()
@@ -17,9 +19,10 @@ class ChecklistViewController: UITableViewController, ItemDetailViewControllerDe
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        navigationController?.navigationBar.prefersLargeTitles = true
-        
         loadChecklistItems()
+        title = checklist.name
+        
+        navigationItem.largeTitleDisplayMode = .never
         
         print("Documents folder is \(documentsDirectory())")
         print("Data file path is \(dataFilePath())")
