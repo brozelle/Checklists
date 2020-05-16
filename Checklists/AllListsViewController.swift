@@ -9,19 +9,32 @@
 import UIKit
 
 //make AllListsViewController the delegate for ListDetailViewController
-class AllListsViewController: UITableViewController, ListDetailViewControllerDelegate {
+class AllListsViewController: UITableViewController, ListDetailViewControllerDelegate, UINavigationControllerDelegate {
     
     var dataModel: DataModel!
     
     //helps create a new table view cell.
     let cellIdentifier = "ChecklistCell"
     
+    
+    //Which checklist needs to be displayed at startup?
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        navigationController?.delegate = self
+        
+        let index = dataModel.indexOfSelectedChecklist
+        if  index >= 0 && index < dataModel.lists.count {
+            let checklist = dataModel.lists[index]
+            performSegue(withIdentifier: "ShowChecklist",
+                         sender: checklist)
+        }
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
         //enable large titles.
         navigationController?.navigationBar.prefersLargeTitles = true
-        
         
         //registers the cell identifier with the underlying table view.
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: cellIdentifier)
@@ -36,6 +49,7 @@ class AllListsViewController: UITableViewController, ListDetailViewControllerDel
         if segue.identifier == "ShowChecklist" {
             
             let controller = segue.destination as! ChecklistViewController
+            
             //passes the Checklist object from the tapped row to ChecklistViewController
             controller.checklist = sender as? Checklist
             
@@ -54,14 +68,26 @@ class AllListsViewController: UITableViewController, ListDetailViewControllerDel
         
         let checklist = dataModel.lists[indexPath.row]
         controller.checklistToEdit = checklist
-        navigationController?.pushViewController(controller, animated: true)
+        navigationController?.pushViewController(controller,
+                                                 animated: true)
+    }
+    
+    //MARK:- Navigation Controller Delegates
+    func navigationController( _ navigationController: UINavigationController,
+                               willShow viewController: UIViewController,
+                               animated: Bool) {
+        
+        //was the background button tapped?
+        if viewController === self {
+            //UserDefaults.standard.set(-1, forKey: "ChecklistIndex")
+            dataModel.indexOfSelectedChecklist = -1
+        }
     }
     
     
     // MARK:- List Detail View Controller Delegates
     
-    func listDetailViewControllerDidCancel(
-        _ controller: ListDetailViewController) {
+    func listDetailViewControllerDidCancel( _ controller: ListDetailViewController) {
         navigationController?.popViewController(animated: true)
     }
     
@@ -126,13 +152,15 @@ class AllListsViewController: UITableViewController, ListDetailViewControllerDel
         cell.textLabel!.text = checklist.name
         cell.accessoryType = .detailDisclosureButton
         
-        //cell.textLabel!.text = "List \(indexPath.row)"
-
         return cell
     }
     
     override func tableView(_ tableView: UITableView,
                             didSelectRowAt indexPath: IndexPath) {
+        
+        //stores the index of the selected row into user defaults
+        
+        dataModel.indexOfSelectedChecklist = indexPath.row
         
         //sends the checklist object from the row the user tapped on
         let checklist = dataModel.lists[indexPath.row]

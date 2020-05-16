@@ -115,12 +115,12 @@
 				5D3C994A246CD6560000C1E0 /* Checklist.swift */,
 				5DA2EBA3246B19590099220D /* ChecklistItem.swift */,
 				5DA2EB77246A5B6B0099220D /* ChecklistViewController.swift */,
+				5D3C994E246F6EDC0000C1E0 /* DataModel.swift */,
 				5DA2EB81246A5B6D0099220D /* Info.plist */,
 				5DA2EBA5246B771D0099220D /* ItemDetailViewController.swift */,
 				5DA2EB7E246A5B6D0099220D /* LaunchScreen.storyboard */,
 				5D3C994C246E00AB0000C1E0 /* ListDetailViewController.swift */,
 				5DA2EB79246A5B6B0099220D /* Main.storyboard */,
-				5D3C994E246F6EDC0000C1E0 /* DataModel.swift */,
 			);
 			path = Checklists;
 			sourceTree = "<group>";

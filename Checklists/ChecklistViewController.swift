@@ -13,9 +13,6 @@ class ChecklistViewController: UITableViewController, ItemDetailViewControllerDe
     //for the Checklist screen title.
     var checklist: Checklist!
     
-    //items is a variable of ChecklistItem(s)
-    //var items = [ChecklistItem]()
-    
     override func viewDidLoad() {
         super.viewDidLoad()
         
