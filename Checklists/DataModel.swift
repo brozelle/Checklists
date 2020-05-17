@@ -62,6 +62,13 @@ class DataModel {
         return documentsDirectory().appendingPathComponent("Checklists.plist")
     }
     
+    //sorting the checklists
+    func sortChecklists() {
+        lists.sort(by: { list1, list2 in
+            return list1.name.localizedStandardCompare(list2.name) == .orderedAscending
+        })
+    }
+    
     func saveChecklists() {
         //Create an instance of PropertyListEncoder
         let encoder = PropertyListEncoder()
@@ -91,6 +98,8 @@ class DataModel {
             do {
                 //load the saved data back into items
                 lists = try decoder.decode([Checklist].self, from: data)
+                //and sorts them
+                sortChecklists()
             } catch {
                 //if there was an error, print it in the console.
                 print("Error decoding item array:  \(error.localizedDescription)")

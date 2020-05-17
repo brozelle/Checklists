@@ -17,6 +17,11 @@ class AllListsViewController: UITableViewController, ListDetailViewControllerDel
     let cellIdentifier = "ChecklistCell"
     
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        tableView.reloadData()
+    }
+    
     //Which checklist needs to be displayed at startup?
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
@@ -37,7 +42,7 @@ class AllListsViewController: UITableViewController, ListDetailViewControllerDel
         navigationController?.navigationBar.prefersLargeTitles = true
         
         //registers the cell identifier with the underlying table view.
-        tableView.register(UITableViewCell.self, forCellReuseIdentifier: cellIdentifier)
+        //tableView.register(UITableViewCell.self, forCellReuseIdentifier: cellIdentifier)
 
     }
     
@@ -94,15 +99,15 @@ class AllListsViewController: UITableViewController, ListDetailViewControllerDel
     func listDetailViewController( _ controller: ListDetailViewController,
                                    didFinishAdding checklist: Checklist) {
         
-        let newRowIndex = dataModel.lists.count
+        //let newRowIndex = dataModel.lists.count
         dataModel.lists.append(checklist)
+        dataModel.sortChecklists()
+        tableView.reloadData()
         
-        let indexPath = IndexPath(row: newRowIndex,
-                                  section: 0)
+        //let indexPath = IndexPath(row: newRowIndex, section: 0)
         
-        let indexPaths = [indexPath]
-        tableView.insertRows(at: indexPaths,
-                             with: .automatic)
+        //let indexPaths = [indexPath]
+        //tableView.insertRows(at: indexPaths, with: .automatic)
         
         navigationController?.popViewController(animated: true)
     }
@@ -110,14 +115,16 @@ class AllListsViewController: UITableViewController, ListDetailViewControllerDel
     func listDetailViewController( _ controller: ListDetailViewController,
                                    didFinishEditing checklist: Checklist) {
         
-        if let index = dataModel.lists.index(of: checklist) {
+        dataModel.sortChecklists()
+        tableView.reloadData()
+        /*if let index = dataModel.lists.index(of: checklist) {
             let indexPath = IndexPath(row: index,
                                       section: 0)
             
             if let cell = tableView.cellForRow(at: indexPath) {
                 cell.textLabel!.text = checklist.name
             }
-        }
+        }*/
         navigationController?.popViewController(animated: true)
     }
     
@@ -145,13 +152,32 @@ class AllListsViewController: UITableViewController, ListDetailViewControllerDel
                             cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
         //helps create the table view cell.
-        let cell = tableView.dequeueReusableCell(withIdentifier: cellIdentifier,
-                                                 for: indexPath)
+        //let cell = tableView.dequeueReusableCell(withIdentifier: cellIdentifier, for: indexPath)
+        
+        //Get a cell
+        let cell: UITableViewCell!
+        if let c = tableView.dequeueReusableCell(withIdentifier: cellIdentifier) {
+            cell = c
+        } else {
+            cell = UITableViewCell(style: .subtitle,
+                                   reuseIdentifier: cellIdentifier)
+        }
+        
         //Fill in the cells for the rows.
         let checklist = dataModel.lists[indexPath.row]
         cell.textLabel!.text = checklist.name
         cell.accessoryType = .detailDisclosureButton
         
+        //subtitle text
+        let count = checklist.countUncheckedItems()
+        if checklist.items.count == 0 {
+            cell.detailTextLabel!.text = "(No Items)"
+        } else {
+        //ternary conditional operator
+        cell.detailTextLabel!.text = count == 0 ? "All Done!" : "\(count) Remaining"
+        }
+        //puts the icon image into the table view celll
+        cell.imageView!.image = UIImage(named: checklist.iconName)
         return cell
     }
     
